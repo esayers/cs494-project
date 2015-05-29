@@ -4,6 +4,7 @@
 # EXAMPLE: echo_client_sockets.py localhost 8000 Hello
 import socket
 import sys
+import time
 
 if len(sys.argv) < 4:
     print "USAGE: echo_client_sockets.py <HOST> <PORT> <MESSAGE>";
@@ -15,10 +16,19 @@ host = sys.argv[1]
 port = int(sys.argv[2])
 s.connect((host,port))
 
-s.send(sys.argv[3])
+s.send(sys.argv[3] + ":1")
+data = s.recv(10000000)
+print data
+print 'received', len(data), ' bytes'
+s.send(sys.argv[3] + ":2")
+data = s.recv(10000000)
+print data
+print 'received', len(data), ' bytes'
+s.send(sys.argv[3] + ":3")
 
 i = 0
 data = s.recv(10000000)
 print data
 print 'received', len(data), ' bytes'
+time.sleep(10)
 s.close()
