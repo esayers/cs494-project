@@ -40,12 +40,10 @@ if soc is None:
     print "Could not start server at port " + str(port)
     sys.exit(0)
 
-print "Server started at port " + str(port)\
-
-so = myirc.IrcServer()
+print "Server started at port " + str(port)
 
 # Start server thread
-th = myirc.ServerThread(1, "Server", soc, so)
+th = myirc.ServerThread(1, "Server", soc)
 th.start()
 
 # User input

@@ -1,5 +1,12 @@
 import threading
 import socket
+import re
+
+#
+#
+# Thread class to handle clients once connected
+#
+#
 
 class ClientThread(threading.Thread):
     def __init__(self, tid, name, con, addr, so):
@@ -7,6 +14,8 @@ class ClientThread(threading.Thread):
         self.tid = tid
         self.name = name
         self.con = con
+        self.command_pat = re.compile(r'^([a-zA-Z]+|[0-9]{3})')
+        self.param_pat = re.compile(r'((?<= \:)[^\0\n\r]*(?=\r\n)|(?<= )[^ :\0\n\r][^ \0\n\r]*)')
 	self.addr = addr
         self.so = so
         self._stop = threading.Event()
@@ -22,7 +31,12 @@ class ClientThread(threading.Thread):
             if recv == '':
                 break
 
-            self.con.send(str(self.tid) + ": " + recv + "\n\r")
+            command = self.command_pat.match(recv)
+            params = self.param_pat.findall(recv)
+            print repr(recv)
+            print command.group(1)
+            for p in params:
+                print p
 
         self.con.shutdown(socket.SHUT_RDWR)
         self.con.close()
@@ -40,12 +54,12 @@ class ClientThread(threading.Thread):
 #
 
 class ServerThread(threading.Thread):
-    def __init__(self, tid, name, soc, so):
+    def __init__(self, tid, name, soc):
         threading.Thread.__init__(self)
         self.tid = tid
         self.name = name
         self.soc = soc
-        self.so = so
+        self.irc = IrcServer()
         self._stop = threading.Event()
         self.tlist = []
         self.tcount = 0
@@ -68,7 +82,7 @@ class ServerThread(threading.Thread):
 
             # Add new connection to list and start it
             self.tcount += 1
-            self.tlist.append(ClientThread(self.tcount, str(addr) + ":" + str(self.tcount), conn, addr, self.so))
+            self.tlist.append(ClientThread(self.tcount, "", conn, addr, self.irc))
             self.tlist[-1].start()
 
         # Stop each connection then wait for it to finish
@@ -83,14 +97,19 @@ class ServerThread(threading.Thread):
         return not self._stop.isSet()
 
 #
+#
+# 
+#
+#
+
 class IrcServer:
     def __init__(self):
         self.users = []
+        self.rooms = []
 
-
-
-class IrcUser:
-    def __init__(self):
-
-
+    def add_user(name):
+        if name in self.users:
+            return False
         
+        self.users.append(name)
+        return True

@@ -16,19 +16,8 @@ host = sys.argv[1]
 port = int(sys.argv[2])
 s.connect((host,port))
 
-s.send(sys.argv[3] + ":1")
-data = s.recv(10000000)
-print data
-print 'received', len(data), ' bytes'
-s.send(sys.argv[3] + ":2")
-data = s.recv(10000000)
-print data
-print 'received', len(data), ' bytes'
-s.send(sys.argv[3] + ":3")
-
-i = 0
-data = s.recv(10000000)
-print data
-print 'received', len(data), ' bytes'
-time.sleep(10)
+s.send(sys.argv[3] + "\r\n")
+#data = s.recv(10000000)
+#print data
+#print 'received', len(data), ' bytes'
 s.close()
