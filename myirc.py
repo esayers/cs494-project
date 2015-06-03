@@ -3,6 +3,8 @@ import socket
 import re
 from collections import defaultdict
 
+DEBUG = True
+
 #
 #
 # Thread class to handle clients once connected
@@ -40,6 +42,9 @@ class ClientThread(threading.Thread):
 
             if recv == '':
                 break
+
+            if DEBUG:
+                print recv
 
             command = self.command_pat.match(recv)
             params = self.param_pat.findall(recv)
@@ -272,7 +277,7 @@ class IrcServer:
         if re.match("^#\w{0,8}$", room) == None:
             raise RoomInvalid(room)
 
-        with self.lock():
+        with self.lock:
             if name not in self.users:
                 raise NotConnected
         
@@ -287,7 +292,7 @@ class IrcServer:
     def leave_room(self, name, room):
         """ Removes a user from a single room.
         """
-        with self.lock():
+        with self.lock:
             if name not in self.users:
                 raise NotConnected
 
